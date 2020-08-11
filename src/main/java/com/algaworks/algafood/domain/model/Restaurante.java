@@ -17,13 +17,18 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.algaworks.algafood.Groups;
+import com.algaworks.algafood.core.TaxaFrete;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -43,11 +48,14 @@ public class Restaurante {
 	@NotBlank
 	private String nome;
 	
-	@PositiveOrZero
+	@NotNull
+	@TaxaFrete
 	@Column(name = "taxa_frete")
 	private BigDecimal taxaFrete;
 	
+	@Valid
 	@NotNull
+	@ConvertGroup(from = Default.class, to = Groups.CozinhaId.class)
 	@ManyToOne
 	@JoinColumn(name = "cozinha_id", nullable = false)
 	private Cozinha cozinha;
