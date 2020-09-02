@@ -14,12 +14,12 @@ public class FormaPagamento {
 	private Long id;
 	
 	private String descricao;
-	
-	public long getId() {
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -35,7 +35,7 @@ public class FormaPagamento {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -48,11 +48,15 @@ public class FormaPagamento {
 		if (getClass() != obj.getClass())
 			return false;
 		FormaPagamento other = (FormaPagamento) obj;
-		if (id != other.id)
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
-	
+
+
 	
 	
 

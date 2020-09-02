@@ -1,6 +1,6 @@
 package com.algaworks.algafood.domain.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,10 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import lombok.Data;
+
 @Entity
+@Data
 @Table(name = "usuario")
 public class Usuario {
 	
@@ -35,7 +38,7 @@ public class Usuario {
 	
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
-	private LocalDateTime dataCadastro;
+	private OffsetDateTime dataCadastro;
 	
 	
 	@ManyToMany
@@ -43,5 +46,15 @@ public class Usuario {
 	joinColumns = @JoinColumn(name = "usuario_id"),
 	inverseJoinColumns = @JoinColumn(name = "grupo_id"))
 	private List<Grupo> grupos = new ArrayList<>();
+	
+	
+	public boolean senhaCoincideCom(String senha) {
+	    return getSenha().equals(senha);
+	}
+
+	public boolean senhaNaoCoincideCom(String senha) {
+		return !senhaCoincideCom(senha);
+	    
+	}
 
 }

@@ -1,6 +1,6 @@
 package com.algaworks.algafood.exceptionhandler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +22,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.algaworks.algafood.core.ValidacaoException;
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.NegocioException;
@@ -39,14 +40,22 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	@Autowired
 	private MessageSource messageSource;
 	
+	@ExceptionHandler({ ValidacaoException.class })
+	public ResponseEntity<Object> handleValidacaoException(ValidacaoException ex, WebRequest request) {
+		return handleValidationInternal(ex, ex.getBindingResult(), new HttpHeaders(), 
+				HttpStatus.BAD_REQUEST, request);
+	}
+	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+	    return handleValidationInternal(ex, ex.getBindingResult(), headers, status, request);
+	}
 
-	    ProblemType problemType = ProblemType.DADOS_INVALIDOS;
+	private ResponseEntity<Object> handleValidationInternal(Exception ex, BindingResult bindingResult, HttpHeaders headers,
+			HttpStatus status, WebRequest request) {
+		ProblemType problemType = ProblemType.DADOS_INVALIDOS;
 	    String detail = "Um ou mais campos estão inválidos. Faça o preenchimento correto e tente novamente.";
-	    
-	    BindingResult bindingResult = ex.getBindingResult();
 	    
 	    List<Problem.Field> problemFields = bindingResult.getFieldErrors().stream()
 	    		.map(fieldError -> {
@@ -92,7 +101,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = String.format("O recurso %s, que você tentou acessar não existe.", ex.getRequestURL());
 		
 		Problem problem = createProblemBuilder(status, problemType, detail)
-				.userMessage(String.format("O recurso %s, que você tentou acessar não existe.", ex.getRequestURL()))
+				.userMessage(detail)
 				.build();
 		
 		return handleExceptionInternal(ex, problem, headers, status, request);
@@ -237,14 +246,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 					.title(status.getReasonPhrase())
 					.status(status.value())
 					.userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
-					.timestamp(LocalDateTime.now())
+					.timestamp(OffsetDateTime.now())
 					.build();
 		} else if (body instanceof String) {
 			body = Problem.builder()
 					.title((String) body)
 					.status(status.value())
 					.userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
-					.timestamp(LocalDateTime.now())
+					.timestamp(OffsetDateTime.now())
 					.build();
 		}
 		return super.handleExceptionInternal(ex, body, headers, status, request);
@@ -252,7 +261,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String detail) {
 		return Problem.builder()
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.status(status.value())
 				.type(problemType.getUri())
 				.title(problemType.getTitle())
