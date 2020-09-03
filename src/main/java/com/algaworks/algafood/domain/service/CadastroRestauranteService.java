@@ -10,6 +10,7 @@ import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.model.Cozinha;
+import com.algaworks.algafood.domain.model.FormaPagamento;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 
@@ -24,6 +25,9 @@ public class CadastroRestauranteService {
 	
 	@Autowired
 	private CadastroCidadeService cadastroCidade;
+	
+	@Autowired
+	private CadastroFormaPagamentoService cadastroFormaPagamento;
 	
 
 	@Transactional
@@ -55,9 +59,20 @@ public class CadastroRestauranteService {
 		}
 	}
 	
-	public Restaurante buscarOuFalhar (Long restauranteId) {
-		 return restauranteRepository.findById(restauranteId)
-		.orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
+	@Transactional
+	public void desassociarFormaPagamento (Long restauranteId, Long formaPagamentoId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		FormaPagamento formaPagamento = cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId);
+		
+		restaurante.removerFormaPagamento(formaPagamento);
+	}
+	
+	@Transactional
+	public void associarFormaPagamento (Long restauranteId, Long formaPagamentoId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		FormaPagamento formaPagamento = cadastroFormaPagamento.buscarOuFalhar(formaPagamentoId);
+		
+		restaurante.adicionarFormaPagamento(formaPagamento);
 	}
 	
 	@Transactional
@@ -71,5 +86,11 @@ public class CadastroRestauranteService {
 		Restaurante restauranteAtual = buscarOuFalhar(restauranteId);
 		restauranteAtual.inativar();
 	}
+	
+	public Restaurante buscarOuFalhar (Long restauranteId) {
+		 return restauranteRepository.findById(restauranteId)
+		.orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
+	}
+	
 
 }

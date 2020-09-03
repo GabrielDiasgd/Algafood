@@ -17,12 +17,15 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Table(name = "usuario")
 public class Usuario {
 	
+	@EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

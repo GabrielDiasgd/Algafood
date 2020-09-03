@@ -2,8 +2,6 @@ package com.algaworks.algafood.domain.service;
 
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,9 +21,6 @@ public class CadastroUsuarioService {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
-
-	@Autowired
-	private EntityManager manager;
 
 	@Transactional
 	public Usuario salvar(Usuario usuario) {
