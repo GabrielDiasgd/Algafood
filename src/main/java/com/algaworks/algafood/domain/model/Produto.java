@@ -29,7 +29,7 @@ public class Produto {
 	private BigDecimal preco;
 	
 	@Column(nullable = false)
-	private boolean ativo;
+	private Boolean ativo;
 	
 	@ManyToOne
 	@JoinColumn(nullable = false)
@@ -85,10 +85,10 @@ public class Produto {
 	public void setPreco(BigDecimal preco) {
 		this.preco = preco;
 	}
-	public boolean isAtivo() {
+	public Boolean isAtivo() {
 		return ativo;
 	}
-	public void setAtivo(boolean ativo) {
+	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
 	}
 	public Restaurante getRestaurante() {

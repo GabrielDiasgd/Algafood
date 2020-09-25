@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
-import com.algaworks.algafood.Groups;
+import com.algaworks.algafood.core.validation.Groups;
 
 @Entity
 public class Cidade {

@@ -28,8 +28,8 @@ import javax.validation.groups.Default;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.algaworks.algafood.Groups;
-import com.algaworks.algafood.core.TaxaFrete;
+import com.algaworks.algafood.core.validation.Groups;
+import com.algaworks.algafood.core.validation.TaxaFrete;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -65,6 +65,8 @@ public class Restaurante {
 	private Endereco endereco;
 	
 	private Boolean ativo = Boolean.TRUE;
+	
+	private Boolean aberto = Boolean.FALSE;
 
 	
 	@CreationTimestamp
@@ -88,12 +90,34 @@ public class Restaurante {
 				inverseJoinColumns = @JoinColumn(name ="forma_pagamento_id"))
 	private Set<FormaPagamento> formasPagamento = new HashSet<FormaPagamento>();
 	
+	@ManyToMany
+	@JoinTable(name = "restaurante_usuario_responsavel",
+				joinColumns = @JoinColumn(name = "restaurante_id"),
+				inverseJoinColumns = @JoinColumn(name = "usuario_id"))
+	private Set<Usuario> responsaveis = new HashSet<>();
+	
+	public boolean adicionarResponsavel(Usuario usuario) {
+		return getResponsaveis().add(usuario);
+	}
+	
+	public boolean removerResponsavel(Usuario usuario) {
+		return getResponsaveis().remove(usuario);
+	}
+	
 	public boolean removerFormaPagamento(FormaPagamento formaPagamento) {
 		return getFormasPagamento().remove(formaPagamento);
 	}
 	
 	public boolean adicionarFormaPagamento(FormaPagamento formaPagamento) {
 		return getFormasPagamento().add(formaPagamento);
+	}
+	
+	public void abrir () {
+		setAberto(true);
+	}
+	
+	public void fechar () {
+		setAberto(false);
 	}
 	
 	
@@ -103,6 +127,14 @@ public class Restaurante {
 	
 	public void inativar() {
 		setAtivo(false);
+	}
+	
+	public boolean aceitaFormaPagamento(FormaPagamento formaPagamento) {
+	    return getFormasPagamento().contains(formaPagamento);
+	}
+
+	public boolean naoAceitaFormaPagamento(FormaPagamento formaPagamento) {
+	    return !aceitaFormaPagamento(formaPagamento);
 	}
 
 }

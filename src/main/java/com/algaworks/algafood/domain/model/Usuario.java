@@ -1,8 +1,8 @@
 package com.algaworks.algafood.domain.model;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,8 +48,15 @@ public class Usuario {
 	@JoinTable(name = "usuario_grupo",
 	joinColumns = @JoinColumn(name = "usuario_id"),
 	inverseJoinColumns = @JoinColumn(name = "grupo_id"))
-	private List<Grupo> grupos = new ArrayList<>();
+	private Set<Grupo> grupos = new HashSet<>();
 	
+	public boolean associar (Grupo grupo) {
+		return getGrupos().add(grupo);
+	}
+	
+	public boolean desassociar (Grupo grupo) {
+		return getGrupos().remove(grupo);
+	}
 	
 	public boolean senhaCoincideCom(String senha) {
 	    return getSenha().equals(senha);

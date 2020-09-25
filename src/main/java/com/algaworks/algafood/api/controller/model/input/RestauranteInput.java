@@ -6,7 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.algaworks.algafood.core.TaxaFrete;
+import com.algaworks.algafood.core.validation.TaxaFrete;
 
 import lombok.Getter;
 import lombok.Setter;

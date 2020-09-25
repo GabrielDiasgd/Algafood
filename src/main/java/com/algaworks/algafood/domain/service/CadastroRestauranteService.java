@@ -1,5 +1,7 @@
 package com.algaworks.algafood.domain.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,6 +14,7 @@ import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.FormaPagamento;
 import com.algaworks.algafood.domain.model.Restaurante;
+import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 
 @Service
@@ -25,6 +28,9 @@ public class CadastroRestauranteService {
 	
 	@Autowired
 	private CadastroCidadeService cadastroCidade;
+	
+	@Autowired
+	private CadastroUsuarioService cadastroUsuario;
 	
 	@Autowired
 	private CadastroFormaPagamentoService cadastroFormaPagamento;
@@ -86,6 +92,47 @@ public class CadastroRestauranteService {
 		Restaurante restauranteAtual = buscarOuFalhar(restauranteId);
 		restauranteAtual.inativar();
 	}
+	
+	@Transactional
+	public void ativar(List<Long> restauranteIds) {
+		restauranteIds.forEach(this::ativar);
+	}	
+	
+	@Transactional
+	public void inativar(List<Long> restauranteIds) {
+		restauranteIds.forEach(this::inativar);
+	}
+	
+	@Transactional
+	public void abertura (Long restauranteId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		restaurante.abrir();
+		
+	}
+	
+	@Transactional
+	public void fechamento (Long restauranteId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		restaurante.fechar();
+		
+	}
+	
+	@Transactional
+	public void removerResponsavel (Long restauranteId, Long usuarioId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
+		
+		restaurante.removerResponsavel(usuario);
+	}
+	
+	@Transactional
+	public void adicionarResponsavel (Long restauranteId, Long usuarioId) {
+		Restaurante restaurante = buscarOuFalhar(restauranteId);
+		Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
+		
+		restaurante.adicionarResponsavel(usuario);
+	}
+	
 	
 	public Restaurante buscarOuFalhar (Long restauranteId) {
 		 return restauranteRepository.findById(restauranteId)
