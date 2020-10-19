@@ -15,6 +15,7 @@ delete from usuario_grupo;
 delete from restaurante_usuario_responsavel;
 delete from pedido;
 delete from item_pedido;
+delete from foto_produto;
 
 set foreign_key_checks = 1;
 
@@ -53,9 +54,9 @@ insert into restaurante (id, nome, taxa_frete, cozinha_id, data_cadastro, data_a
 insert into restaurante (id, nome, taxa_frete, cozinha_id, data_cadastro, data_atualizacao, ativo, aberto) values (5, 'Lanchonete do Tio Sam', 11, 4, utc_timestamp, utc_timestamp, true, true);
 insert into restaurante (id, nome, taxa_frete, cozinha_id, data_cadastro, data_atualizacao, ativo, aberto) values (6, 'Bar da Maria', 6, 4, utc_timestamp, utc_timestamp, true, true);  
 
-insert into forma_pagamento (id, descricao) values (1, 'Cartão de crédito');
-insert into forma_pagamento (id, descricao) values (2, 'Cartão de débito');
-insert into forma_pagamento (id, descricao) values (3, 'Dinheiro');
+insert into forma_pagamento (id, descricao, data_atualizacao) values (1, 'Cartão de crédito', utc_timestamp);
+insert into forma_pagamento (id, descricao, data_atualizacao) values (2, 'Cartão de débito', utc_timestamp);
+insert into forma_pagamento (id, descricao, data_atualizacao) values (3, 'Dinheiro', utc_timestamp);
 
 insert into permissao (id, nome, descricao) values (1, 'CONSULTAR_COZINHAS', 'Permite consultar cozinhas');
 insert into permissao (id, nome, descricao) values (2, 'EDITAR_COZINHAS', 'Permite editar cozinhas');
@@ -81,10 +82,11 @@ insert into grupo (nome) values ('Gerente'), ('Vendedor'), ('Secretária'), ('Ca
 
 insert into grupo_permissao (grupo_id, permissao_id) values (1, 1), (1, 2), (2, 1), (2, 2), (3, 1);
 
-insert into usuario (nome, email, senha, data_cadastro) values ('Gabriel', 'gabriel@gmail.com',1234,utc_timestamp);
+insert into usuario (nome, email, senha, data_cadastro) values ('Gabriel', 'gabrielllloliveira1998@gmail.com',1234,utc_timestamp);
 insert into usuario (nome, email, senha, data_cadastro) values ('João', 'joao@gmail.com',1234,utc_timestamp);
 insert into usuario (nome, email, senha, data_cadastro) values ('Daniel', 'daniel@gmail.com',1234,utc_timestamp);
 insert into usuario (nome, email, senha, data_cadastro) values ('Rafael', 'rafael@gmail.com',1234,utc_timestamp);
+insert into usuario (nome, email, senha, data_cadastro) values ('Silvana', 'silvanadiassr@gmail.com',1234,utc_timestamp);
 
 insert into usuario_grupo (usuario_id, grupo_id) values (1, 1), (1, 2), (2, 2);
 
@@ -107,7 +109,7 @@ values (2, 1, 2, 2, 110, 220, 'Menos picante, por favor');
 insert into pedido (id,codigo, restaurante_id, usuario_cliente_id, forma_pagamento_id, endereco_cidade_id, endereco_cep, 
         endereco_logradouro, endereco_numero, endereco_complemento, endereco_bairro,
         status, data_criacao, subtotal, taxa_frete, valor_total)
-values (2,'7c24e06f-f938-4ea1-be42-18289c6bc07e', 4, 1, 2, 1, '38400-111', 'Rua Acre', '300', 'Casa 2', 'Centro',
+values (2,'7c24e06f-f938-4ea1-be42-18289c6bc07e', 4, 5, 2, 1, '38400-111', 'Rua Acre', '300', 'Casa 2', 'Centro',
 'CRIADO', utc_timestamp, 79, 0, 79);
 
 insert into item_pedido (id, pedido_id, produto_id, quantidade, preco_unitario, preco_total, observacao)

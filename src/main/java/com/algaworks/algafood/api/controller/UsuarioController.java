@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,13 +23,14 @@ import com.algaworks.algafood.api.controller.model.UsuarioModel;
 import com.algaworks.algafood.api.controller.model.input.SenhaInput;
 import com.algaworks.algafood.api.controller.model.input.UsuarioComSenhaInput;
 import com.algaworks.algafood.api.controller.model.input.UsuarioInput;
+import com.algaworks.algafood.api.openapi.controller.UsuarioControllerOpenApi;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.UsuarioRepository;
 import com.algaworks.algafood.domain.service.CadastroUsuarioService;
 
 @RestController
-@RequestMapping("/usuarios")
-public class UsuarioController {
+@RequestMapping(path = "/usuarios", produces = MediaType.APPLICATION_JSON_VALUE)
+public class UsuarioController implements UsuarioControllerOpenApi {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
@@ -42,6 +44,7 @@ public class UsuarioController {
 	@Autowired
 	private UsuarioInputDisassembler usuarioInputDisassembler;
 
+	@Override
 	@GetMapping
 	public List<UsuarioModel> listar() {
 		List<Usuario> usuarios = usuarioRepository.findAll();
@@ -49,12 +52,14 @@ public class UsuarioController {
 	}
 	
 
+	@Override
 	@GetMapping("/{usuarioId}")
 	public UsuarioModel buscar(@PathVariable Long usuarioId) {
 		Usuario usuario = cadastroUsuarioService.buscarOuFalhar(usuarioId);
 		return usuarioModelAssembler.toModel(usuario);
 	}
 
+	@Override
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public UsuarioModel adicionar(@RequestBody @Valid UsuarioComSenhaInput usuarioComSenhaInput) {
@@ -65,6 +70,7 @@ public class UsuarioController {
 	}
 
 
+	@Override
 	@PutMapping("/{usuarioId}")
 	public UsuarioModel atualizar(@PathVariable Long usuarioId,
 			@RequestBody @Valid UsuarioInput usuarioInput) {
@@ -74,18 +80,19 @@ public class UsuarioController {
 		
 		return usuarioModelAssembler.toModel(usuarioAtual);
 	}
-	
+
 	@DeleteMapping("/{usuarioId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover (@PathVariable Long usuarioId) {
 		cadastroUsuarioService.remover(usuarioId);
 	}
 
+	@Override
 	@PutMapping("/{usuarioId}/senha")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void atualizarSenha (@PathVariable Long usuarioId, @RequestBody @Valid SenhaInput senha) {
+	public void alterarSenha (@PathVariable Long usuarioId, @RequestBody @Valid SenhaInput senha) {
 		cadastroUsuarioService.atualizarSenha(usuarioId, senha.getNovaSenha(), senha.getSenhaAtual());
 	}
-	
+
 	
 }

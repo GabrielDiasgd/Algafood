@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.algaworks.algafood.api.assembler.ProdutoInputDisassembler;
 import com.algaworks.algafood.api.assembler.ProdutoModelAssembler;
 import com.algaworks.algafood.api.controller.model.ProdutoModel;
 import com.algaworks.algafood.api.controller.model.input.ProdutoInput;
+import com.algaworks.algafood.api.openapi.controller.RestauranteProdutoControllerOpenApi;
 import com.algaworks.algafood.domain.model.Produto;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.ProdutoRepository;
@@ -29,8 +31,9 @@ import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
-@RequestMapping("/restaurantes/{restauranteId}/produtos")
-public class RestauranteProdutoController {
+@RequestMapping(path = "/restaurantes/{restauranteId}/produtos", 
+produces = MediaType.APPLICATION_JSON_VALUE)
+public class RestauranteProdutoController implements RestauranteProdutoControllerOpenApi {
 
 
 	@Autowired
@@ -49,7 +52,7 @@ public class RestauranteProdutoController {
 	private ProdutoRepository produtoRepository;
 
 	@GetMapping
-	public List<ProdutoModel> Listar(@RequestParam(required = false)boolean inativos ,@PathVariable Long restauranteId) {
+	public List<ProdutoModel> listar(@PathVariable Long restauranteId,@RequestParam(required = false)boolean inativos) {
 		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);
 		List<Produto> produtos = null;
 				
@@ -92,4 +95,5 @@ public class RestauranteProdutoController {
 		return produtoModelAssembler.toModel(produto);
 
 	}
+
 }

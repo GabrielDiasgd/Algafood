@@ -1,11 +1,16 @@
 package com.algaworks.algafood.api.controller;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,18 +20,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import com.algaworks.algafood.api.assembler.FormaPagamentoAssembler;
 import com.algaworks.algafood.api.assembler.FormaPagamentoDisassembler;
 import com.algaworks.algafood.api.controller.model.FormaPagamentoModel;
 import com.algaworks.algafood.api.controller.model.input.FormaPagamentoInput;
+import com.algaworks.algafood.api.openapi.controller.FormaPagamentoControllerOpenApi;
 import com.algaworks.algafood.domain.model.FormaPagamento;
 import com.algaworks.algafood.domain.repository.FormaPagamentoRepository;
 import com.algaworks.algafood.domain.service.CadastroFormaPagamentoService;
 
 @RestController
-@RequestMapping("/formas-pagamento")
-public class FormaPagamentoController {
+@RequestMapping(path = "/formas-pagamento", produces = MediaType.APPLICATION_JSON_VALUE)	
+public class FormaPagamentoController implements FormaPagamentoControllerOpenApi {
 	
 	@Autowired
 	private FormaPagamentoRepository formaPagamentoRepository;
@@ -41,15 +49,53 @@ public class FormaPagamentoController {
 	private FormaPagamentoDisassembler formaPagamentoDisassembler;
 	
 	@GetMapping
-	public List<FormaPagamentoModel> Listar () {
+	public ResponseEntity<List<FormaPagamentoModel>> listar (ServletWebRequest request) {
+		ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
+		
+		String eTag  = "0";
+		
+		OffsetDateTime dataUltimaAtualizacao = formaPagamentoRepository.getDataUltimaAtualizacao();
+		
+		if (dataUltimaAtualizacao != null) {
+			eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
+		}
+		
+		if (request.checkNotModified(eTag)) {
+			return null;
+		}
+		
 		List<FormaPagamento> formaPagamentos = formaPagamentoRepository.findAll();
-		return formaPagamentoAssembler.toCollectionModel(formaPagamentos);
+		
+		List<FormaPagamentoModel> formasPagamentoModel = formaPagamentoAssembler
+				.toCollectionModel(formaPagamentos);
+		 
+		return ResponseEntity.ok()
+				.cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS).cachePublic())
+				.body(formasPagamentoModel);
 	}
 
 	@GetMapping("/{idFormaPagamento}")
-	public FormaPagamentoModel buscar (@PathVariable Long idFormaPagamento){
+	public ResponseEntity<FormaPagamentoModel> buscar (@PathVariable Long idFormaPagamento, ServletWebRequest request){
+		ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());
+		
+		String eTag = "0";
+		
+		OffsetDateTime dataUltimaAtualizacao = formaPagamentoRepository.getDataAtualizacaoById(idFormaPagamento);
+		
+		if (dataUltimaAtualizacao != null) {
+			eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
+		}
+		
+		if (request.checkNotModified(eTag)) {
+			return null;
+		}
+			
 		FormaPagamento formaPagamento = cadastroFormaPagamentoService.buscarOuFalhar(idFormaPagamento);
-		return formaPagamentoAssembler.toModel(formaPagamento);
+		FormaPagamentoModel  formaPagamentoModel = formaPagamentoAssembler.toModel(formaPagamento);
+		
+		return ResponseEntity.ok()
+				.cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS))
+				.body(formaPagamentoModel);
 	}
 	
 
@@ -81,13 +127,5 @@ public class FormaPagamentoController {
 	public void remover(@PathVariable Long idFormaPagamento) {
 		cadastroFormaPagamentoService.remover(idFormaPagamento);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }

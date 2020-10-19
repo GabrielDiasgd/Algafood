@@ -29,6 +29,8 @@ public interface RestauranteRepository extends CustomJpaRepository<Restaurante, 
 	List<Restaurante> findTop2ByNomeContaining(String nome);
 	
 	Optional<Restaurante> findFirstByNomeContaining(String nome);
+	
+	List<Restaurante> findByNomeContaining(String nome);
 	 
 	int countByCozinhaId (Long cozinhaId);
 	
