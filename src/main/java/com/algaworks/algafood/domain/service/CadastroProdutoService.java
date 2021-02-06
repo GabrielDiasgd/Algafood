@@ -17,6 +17,7 @@ public class CadastroProdutoService {
 	@Transactional
 	public Produto salvar (Produto produto) {
 		return produtoRepository.save(produto);
+
 	}
 	
 	public Produto buscarOuFalhar (Long produtoId, Long restauranteId) {

@@ -62,6 +62,7 @@ public class Pedido extends AbstractAggregateRoot<Pedido> {
 	//@Column(name = "data_criacao", nullable = false, columnDefinition = "datetime")
 	@CreationTimestamp
 	private OffsetDateTime dataCriacao;
+
 	
 	@Column(name = "data_confirmacao")
 	private OffsetDateTime dataConfirmacao;
@@ -114,6 +115,18 @@ public class Pedido extends AbstractAggregateRoot<Pedido> {
 		setDataCancelamento(OffsetDateTime.now());
 		
 		registerEvent(new PedidoCanceladoEvent(this));
+	}
+	
+	public boolean podeSerConfirmado() {
+		return getStatus().podeAlterarPara(StatusPedido.CONFIRMADO);
+	}
+	
+	public boolean podeSerCancelado() {
+		return getStatus().podeAlterarPara(StatusPedido.CANCELADO);
+	}
+	
+	public boolean podeSerEntregue() {
+		return getStatus().podeAlterarPara(StatusPedido.ENTREGUE);
 	}
 	
 	private void setStatus (StatusPedido novoStatus) {
